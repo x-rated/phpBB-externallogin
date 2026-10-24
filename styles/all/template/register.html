@@ -1,0 +1,40 @@
+{% include 'overall_header.html' %}
+
+<form method="post" action="{{ S_ACTION }}" id="slamb_externallogin_register">
+<div class="panel">
+	<div class="inner">
+		<div class="content">
+			<h2 class="sitename-title">{{ lang('SLAMB_EXTLOGIN_REGISTER_TITLE', PROVIDER_TITLE) }}</h2>
+			{% if ERROR %}<p class="error">{{ ERROR }}</p>{% endif %}
+			<fieldset class="fields2">
+				<dl>
+					<dt><label for="username">{{ lang('USERNAME') }}{{ lang('COLON') }}</label><br /><span>{{ USERNAME_EXPLAIN }}</span></dt>
+					<dd><input type="text" tabindex="1" name="username" id="username" size="25" value="{{ USERNAME }}" class="inputbox autowidth" autocomplete="username" /></dd>
+				</dl>
+				<dl>
+					<dt><label for="email">{{ lang('EMAIL_ADDRESS') }}{{ lang('COLON') }}</label></dt>
+					<dd>{% if S_EMAIL_LOCKED %}<strong>{{ EMAIL }}</strong>{% else %}<input type="email" tabindex="2" name="email" id="email" size="25" maxlength="100" value="{{ EMAIL }}" class="inputbox autowidth" autocomplete="email" />{% endif %}</dd>
+				</dl>
+				<dl>
+					<dd><label for="agreed"><input type="checkbox" name="agreed" id="agreed" value="1"{% if S_AGREED %} checked="checked"{% endif %} /> {{ lang('SLAMB_EXTLOGIN_AGREE', U_TERMS_USE, U_PRIVACY) }}</label></dd>
+				</dl>
+				{% if S_COPPA %}
+				<dl>
+					<dd><label for="adult"><input type="checkbox" name="adult" id="adult" value="1"{% if S_ADULT %} checked="checked"{% endif %} /> {{ lang('SLAMB_EXTLOGIN_ADULT') }}</label></dd>
+				</dl>
+				{% endif %}
+			</fieldset>
+		</div>
+	</div>
+</div>
+<div class="panel">
+	<div class="inner">
+		<fieldset class="submit-buttons">
+			<input type="submit" name="submit" id="submit" class="button1" value="{{ lang('SUBMIT') }}" tabindex="3" />
+			{{ S_FORM_TOKEN }}
+		</fieldset>
+	</div>
+</div>
+</form>
+
+{% include 'overall_footer.html' %}

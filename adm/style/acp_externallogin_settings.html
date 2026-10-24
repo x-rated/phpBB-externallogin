@@ -1,0 +1,56 @@
+{% include 'overall_header.html' %}
+
+<h1>{{ lang('ACP_SLAMB_EXTLOGIN_SETTINGS') }}</h1>
+
+<p>{{ lang('ACP_SLAMB_EXTLOGIN_SETTINGS_EXPLAIN') }}</p>
+
+{% if S_ERROR %}
+	<div class="errorbox">
+		<h3>{{ lang('WARNING') }}</h3>
+		<p>{{ ERROR_MSG }}</p>
+	</div>
+{% endif %}
+
+<form id="slamb_externallogin" method="post" action="{{ U_ACTION }}">
+
+{% for provider in providers %}
+	<fieldset>
+		<legend>{{ provider.TITLE }}</legend>
+		<p>{{ provider.HELP }} <a href="{{ provider.U_CONSOLE }}" target="_blank" rel="noopener noreferrer">{{ lang('ACP_SLAMB_EXTLOGIN_CONSOLE') }}</a></p>
+		<dl>
+			<dt><label for="{{ provider.ID }}_redirect">{{ lang('ACP_SLAMB_EXTLOGIN_REDIRECT_URI') }}{{ lang('COLON') }}</label></dt>
+			<dd><input type="text" id="{{ provider.ID }}_redirect" size="70" value="{{ provider.REDIRECT_URI }}" readonly="readonly" onclick="this.select();" /></dd>
+		</dl>
+		{% if provider.DELETION_URI %}
+		<dl>
+			<dt><label for="{{ provider.ID }}_deletion">{{ lang('ACP_SLAMB_EXTLOGIN_DELETION_URL') }}{{ lang('COLON') }}</label><br /><span>{{ lang('ACP_SLAMB_EXTLOGIN_DELETION_EXPLAIN') }}</span></dt>
+			<dd><input type="text" id="{{ provider.ID }}_deletion" size="70" value="{{ provider.DELETION_URI }}" readonly="readonly" onclick="this.select();" /></dd>
+		</dl>
+		{% endif %}
+		<dl>
+			<dt><label for="{{ provider.ID }}_id">{{ lang('ACP_SLAMB_EXTLOGIN_CLIENT_ID') }}{{ lang('COLON') }}</label></dt>
+			<dd><input type="text" id="{{ provider.ID }}_id" name="{{ provider.ID }}_id" size="70" maxlength="255" value="{{ provider.CLIENT_ID }}" autocomplete="off" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="{{ provider.ID }}_secret">{{ lang('ACP_SLAMB_EXTLOGIN_SECRET') }}{{ lang('COLON') }}</label>{% if provider.S_HAS_SECRET %}<br /><span>{{ lang('ACP_SLAMB_EXTLOGIN_SECRET_SET') }}</span>{% endif %}</dt>
+			<dd><input type="password" id="{{ provider.ID }}_secret" name="{{ provider.ID }}_secret" size="40" maxlength="255" value="" autocomplete="new-password" /></dd>
+		</dl>
+		<dl>
+			<dt><label>{{ lang('ACP_SLAMB_EXTLOGIN_ENABLE') }}{{ lang('COLON') }}</label></dt>
+			<dd>
+				<label><input type="radio" class="radio" name="{{ provider.ID }}_enabled" value="1"{% if provider.S_ENABLED %} checked="checked"{% endif %} /> {{ lang('YES') }}</label>
+				<label><input type="radio" class="radio" name="{{ provider.ID }}_enabled" value="0"{% if not provider.S_ENABLED %} checked="checked"{% endif %} /> {{ lang('NO') }}</label>
+			</dd>
+		</dl>
+	</fieldset>
+{% endfor %}
+
+	<fieldset class="submit-buttons">
+		<legend>{{ lang('SUBMIT') }}</legend>
+		<input class="button1" type="submit" id="submit" name="submit" value="{{ lang('SUBMIT') }}" />&nbsp;
+		<input class="button2" type="reset" id="reset" name="reset" value="{{ lang('RESET') }}" />
+		{{ S_FORM_TOKEN }}
+	</fieldset>
+</form>
+
+{% include 'overall_footer.html' %}

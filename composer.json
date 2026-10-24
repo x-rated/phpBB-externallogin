@@ -1,0 +1,24 @@
+{
+	"name": "slamb/externallogin",
+	"type": "phpbb-extension",
+	"description": "Log in and register with a Google, Microsoft or Facebook account.",
+	"homepage": "https://www.slamb.eu",
+	"version": "0.3.3",
+	"time": "2026-10-24",
+	"license": "GPL-2.0-only",
+	"authors": [
+		{
+			"name": "Slamb",
+			"homepage": "https://www.slamb.eu"
+		}
+	],
+	"require": {
+		"php": ">=8.5"
+	},
+	"extra": {
+		"display-name": "External login",
+		"soft-require": {
+			"phpbb/phpbb": ">=3.3.19,<3.4.0@dev"
+		}
+	}
+}

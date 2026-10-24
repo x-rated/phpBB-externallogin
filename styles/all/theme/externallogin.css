@@ -1,0 +1,20 @@
+.slamb-externallogin-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+}
+
+.slamb-externallogin-button {
+	display: inline-flex;
+	align-items: center;
+	gap: .5em;
+}
+
+.slamb-externallogin-button svg {
+	width: 1.3em;
+	height: 1.3em;
+	fill: currentColor;
+	flex: none;
+}

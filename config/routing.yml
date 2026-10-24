@@ -1,0 +1,28 @@
+slamb_externallogin_start:
+    path: /externallogin/{provider}/start
+    defaults: { _controller: slamb.externallogin.controller.auth:start }
+    requirements:
+        provider: '[a-z0-9_]{1,20}'
+
+slamb_externallogin_callback:
+    path: /externallogin/{provider}/callback
+    defaults: { _controller: slamb.externallogin.controller.auth:callback }
+    requirements:
+        provider: '[a-z0-9_]{1,20}'
+
+slamb_externallogin_register:
+    path: /externallogin/register/{token}
+    defaults: { _controller: slamb.externallogin.controller.register:handle }
+    requirements:
+        token: '[a-f0-9]{32}'
+
+slamb_externallogin_facebook_deletion:
+    path: /externallogin/facebook/deletion
+    defaults: { _controller: slamb.externallogin.controller.facebook_deletion:request }
+    methods: [POST]
+
+slamb_externallogin_deleted:
+    path: /externallogin/facebook/deleted/{code}
+    defaults: { _controller: slamb.externallogin.controller.facebook_deletion:deleted }
+    requirements:
+        code: '[a-f0-9]{24}'

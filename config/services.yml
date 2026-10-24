@@ -1,0 +1,141 @@
+parameters:
+    tables.slamb.externallogin.accounts: '%core.table_prefix%slamb_extlogin_accounts'
+    tables.slamb.externallogin.states: '%core.table_prefix%slamb_extlogin_states'
+    tables.slamb.externallogin.pending: '%core.table_prefix%slamb_extlogin_pending'
+
+services:
+    # ----- Providers -----
+    slamb.externallogin.provider_collection:
+        class: phpbb\di\service_collection
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: service_collection, tag: slamb.externallogin.provider }
+
+    slamb.externallogin.provider.google:
+        class: slamb\externallogin\provider\google
+        arguments:
+            - '@slamb.externallogin.http_client'
+        tags:
+            - { name: slamb.externallogin.provider }
+
+    slamb.externallogin.provider.microsoft:
+        class: slamb\externallogin\provider\microsoft
+        arguments:
+            - '@slamb.externallogin.http_client'
+        tags:
+            - { name: slamb.externallogin.provider }
+
+    slamb.externallogin.provider.facebook:
+        class: slamb\externallogin\provider\facebook
+        arguments:
+            - '@slamb.externallogin.http_client'
+        tags:
+            - { name: slamb.externallogin.provider }
+
+    # ----- Services -----
+    slamb.externallogin.http_client:
+        class: slamb\externallogin\service\http_client
+
+    slamb.externallogin.credentials:
+        class: slamb\externallogin\service\credentials
+        arguments:
+            - '@config'
+            - '@config_text'
+
+    slamb.externallogin.provider_manager:
+        class: slamb\externallogin\service\provider_manager
+        arguments:
+            - '@slamb.externallogin.provider_collection'
+            - '@slamb.externallogin.credentials'
+            - '@controller.helper'
+
+    slamb.externallogin.state_storage:
+        class: slamb\externallogin\service\state_storage
+        arguments:
+            - '@dbal.conn'
+            - '%tables.slamb.externallogin.states%'
+            - '%tables.slamb.externallogin.pending%'
+
+    slamb.externallogin.account_repository:
+        class: slamb\externallogin\service\account_repository
+        arguments:
+            - '@dbal.conn'
+            - '%tables.slamb.externallogin.accounts%'
+            - '%tables.users%'
+            - '%tables.groups%'
+            - '%tables.user_group%'
+
+    slamb.externallogin.user_creator:
+        class: slamb\externallogin\service\user_creator
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@language'
+            - '@notification_manager'
+            - '@user'
+            - '%tables.groups%'
+            - '%tables.profile_fields%'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    # ----- Controllers -----
+    slamb.externallogin.controller.auth:
+        class: slamb\externallogin\controller\auth
+        arguments:
+            - '@controller.helper'
+            - '@language'
+            - '@request'
+            - '@user'
+            - '@slamb.externallogin.provider_manager'
+            - '@slamb.externallogin.state_storage'
+            - '@slamb.externallogin.account_repository'
+            - '@slamb.externallogin.user_creator'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    slamb.externallogin.controller.register:
+        class: slamb\externallogin\controller\register
+        arguments:
+            - '@config'
+            - '@controller.helper'
+            - '@language'
+            - '@request'
+            - '@template'
+            - '@user'
+            - '@slamb.externallogin.provider_manager'
+            - '@slamb.externallogin.state_storage'
+            - '@slamb.externallogin.account_repository'
+            - '@slamb.externallogin.user_creator'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    slamb.externallogin.admin.controller:
+        class: slamb\externallogin\admin\controller
+        arguments:
+            - '@language'
+            - '@request'
+            - '@template'
+            - '@slamb.externallogin.provider_manager'
+            - '@slamb.externallogin.credentials'
+
+    # ----- Event listener -----
+    slamb.externallogin.listener:
+        class: slamb\externallogin\event\listener
+        arguments:
+            - '@config'
+            - '@language'
+            - '@template'
+            - '@user'
+            - '@slamb.externallogin.provider_manager'
+        tags:
+            - { name: event.listener }
+
+    slamb.externallogin.controller.facebook_deletion:
+        class: slamb\externallogin\controller\facebook_deletion
+        arguments:
+            - '@controller.helper'
+            - '@language'
+            - '@request'
+            - '@slamb.externallogin.provider_manager'
+            - '@slamb.externallogin.account_repository'

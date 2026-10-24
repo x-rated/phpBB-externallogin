@@ -1,0 +1,10 @@
+{% if S_SLAMB_EXTLOGIN_REGISTER and slamb_externallogin_providers %}
+<div class="panel slamb-externallogin-register">
+	<div class="inner">
+		<div class="content">
+			<h2>{{ lang('SLAMB_EXTLOGIN_OR_REGISTER') }}</h2>
+			{% include '@slamb_externallogin/buttons.html' %}
+		</div>
+	</div>
+</div>
+{% endif %}
