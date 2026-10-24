@@ -1,0 +1,48 @@
+# Runs the phpBB Extension Pre Validator (EPV) and a PHP syntax check.
+# Results: Actions tab -> "EPV" -> latest run.
+name: EPV
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+
+      - name: PHP syntax check
+        run: |
+          find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l > /dev/null
+
+  epv:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ext
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+
+      - name: Install EPV
+        run: |
+          git clone --depth 1 https://github.com/phpbb/epv.git epv
+          cd epv
+          composer install --no-interaction --no-progress --ignore-platform-reqs
+
+      - name: Build package layout (vendor/name)
+        run: |
+          mkdir -p pkg/slamb/externallogin
+          rsync -a --exclude='.git' --exclude='.github' ext/ pkg/slamb/externallogin/
+
+      - name: Run EPV
+        run: php epv/src/EPV.php run --dir="$GITHUB_WORKSPACE/pkg" --debug
