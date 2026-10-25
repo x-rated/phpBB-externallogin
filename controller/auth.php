@@ -19,6 +19,7 @@ use slamb\externallogin\exception\provider_exception;
 use slamb\externallogin\provider\identity;
 use slamb\externallogin\provider\provider_interface;
 use slamb\externallogin\service\account_repository;
+use slamb\externallogin\service\logger;
 use slamb\externallogin\service\provider_manager;
 use slamb\externallogin\service\state_storage;
 use slamb\externallogin\service\user_creator;
@@ -41,7 +42,8 @@ class auth
 		protected account_repository $accounts,
 		protected user_creator $creator,
 		protected string $root_path,
-		protected string $php_ext
+		protected string $php_ext,
+		protected logger $logger
 	)
 	{
 	}
@@ -54,14 +56,26 @@ class auth
 		$this->language->add_lang('common', 'slamb/externallogin');
 
 		$entry = $this->get_enabled_provider($provider);
+		$purpose = 'login';
 
 		if ($this->user->data['is_registered'])
 		{
-			$this->go_to($this->get_default_target());
+			// A member may come only to add a service, and only through a link made by this board
+			if ($this->request->variable('link', 0) !== 1)
+			{
+				$this->go_to($this->get_default_target());
+			}
+
+			if (!check_link_hash($this->request->variable('hash', ''), 'slamb_externallogin_link'))
+			{
+				throw new http_exception(Response::HTTP_FORBIDDEN, 'FORM_INVALID');
+			}
+
+			$purpose = 'link';
 		}
 
 		$redirect = $this->request->variable('redirect', '');
-		if (strlen($redirect) > 255)
+		if (strlen($redirect) > 255 || $purpose === 'link')
 		{
 			$redirect = '';
 		}
@@ -70,7 +84,7 @@ class auth
 		$verifier = $this->base64url(random_bytes(48));
 		$challenge = $this->base64url(hash('sha256', $verifier, true));
 
-		$state = $this->states->create_state($provider, (string) $this->user->session_id, $nonce, $verifier, $redirect);
+		$state = $this->states->create_state($provider, (string) $this->user->session_id, $nonce, $verifier, $redirect, $purpose);
 
 		$url = $entry->get_authorize_url(
 			$this->providers->get_client_id($provider),
@@ -92,11 +106,6 @@ class auth
 
 		$entry = $this->get_enabled_provider($provider);
 
-		if ($this->user->data['is_registered'])
-		{
-			$this->go_to($this->get_default_target());
-		}
-
 		// The state proves that this answer belongs to a sign-in started in this very browser session
 		$state = $this->request->variable('state', '');
 		$record = $state !== '' ? $this->states->consume_state($state) : null;
@@ -105,6 +114,19 @@ class auth
 			|| $record['provider'] !== $provider
 			|| !hash_equals((string) $record['session_id'], (string) $this->user->session_id))
 		{
+			throw new http_exception(Response::HTTP_BAD_REQUEST, 'SLAMB_EXTLOGIN_ERR_STATE');
+		}
+
+		// Signed in already: the answer is only good for adding a service, started by this member
+		$linking = (string) ($record['purpose'] ?? 'login') === 'link';
+
+		if ($this->user->data['is_registered'] !== $linking)
+		{
+			if ($this->user->data['is_registered'])
+			{
+				$this->go_to($this->get_default_target());
+			}
+
 			throw new http_exception(Response::HTTP_BAD_REQUEST, 'SLAMB_EXTLOGIN_ERR_STATE');
 		}
 
@@ -138,7 +160,45 @@ class auth
 			throw new http_exception(Response::HTTP_BAD_GATEWAY, 'SLAMB_EXTLOGIN_ERR_PROVIDER');
 		}
 
+		if ($linking)
+		{
+			return $this->link_identity($identity);
+		}
+
 		return $this->handle_identity($identity, (string) $record['redirect']);
+	}
+
+	/**
+	 * A signed-in member adds a service to the account.
+	 */
+	protected function link_identity(identity $identity): Response
+	{
+		$user_id = (int) $this->user->data['user_id'];
+		$owner = $this->accounts->find_user_id($identity->provider, $identity->uid);
+		$back = append_sid($this->root_path . 'ucp.' . $this->php_ext, 'i=-slamb-externallogin-ucp-main_module&mode=services');
+
+		if ($owner !== 0 && $owner !== $user_id)
+		{
+			throw new http_exception(Response::HTTP_CONFLICT, 'SLAMB_EXTLOGIN_ERR_LINKED_OTHER');
+		}
+
+		if ($owner === 0)
+		{
+			// One account per service keeps unlinking understandable
+			foreach ($this->accounts->get_links($user_id) as $row)
+			{
+				if ($row['provider'] === $identity->provider)
+				{
+					throw new http_exception(Response::HTTP_CONFLICT, 'SLAMB_EXTLOGIN_ERR_ALREADY_LINKED');
+				}
+			}
+
+			$this->accounts->link($user_id, $identity);
+			$this->logger->linked($user_id, $identity->provider);
+		}
+
+		meta_refresh(3, $back);
+		trigger_error($this->language->lang('SLAMB_EXTLOGIN_LINKED', $this->providers->all()[$identity->provider]->get_title()) . '<br /><br /><a href="' . $back . '">' . $this->language->lang('SLAMB_EXTLOGIN_BACK') . '</a>');
 	}
 
 	/**
@@ -166,6 +226,11 @@ class auth
 				{
 					$this->accounts->link((int) $matches[0]['user_id'], $identity);
 					$this->sign_in((int) $matches[0]['user_id'], $redirect);
+				}
+
+				foreach ($matches as $match)
+				{
+					$this->logger->refused((int) $match['user_id'], $identity->provider);
 				}
 
 				throw new http_exception(Response::HTTP_CONFLICT, 'SLAMB_EXTLOGIN_ERR_EMAIL_EXISTS');

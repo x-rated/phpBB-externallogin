@@ -18,3 +18,47 @@
 	fill: currentColor;
 	flex: none;
 }
+
+/* Keep the consent sentence in one piece even where a style turns labels into flex rows */
+.slamb-externallogin-consent {
+	display: inline-block;
+	min-width: 0;
+	vertical-align: top;
+}
+
+/* Linked services list: one row per service, works the same in prosilver and custom styles */
+.slamb-externallogin-service {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin: 0;
+	padding: 10px 0;
+	border-top: 1px solid rgba(128, 128, 128, 0.25);
+}
+
+.slamb-externallogin-service:first-child {
+	border-top: 0;
+}
+
+.slamb-externallogin-service-name {
+	flex: 0 0 30%;
+	min-width: 0;
+	margin: 0;
+	font-weight: bold;
+}
+
+.slamb-externallogin-service-action {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 12px;
+	margin: 0;
+}
+
+.slamb-externallogin-service-since {
+	margin: 0;
+}
+
+.slamb-externallogin-service-action .button2 {
+	margin: 0;
+}

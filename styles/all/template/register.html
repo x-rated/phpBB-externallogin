@@ -16,11 +16,11 @@
 					<dd>{% if S_EMAIL_LOCKED %}<strong>{{ EMAIL }}</strong>{% else %}<input type="email" tabindex="2" name="email" id="email" size="25" maxlength="100" value="{{ EMAIL }}" class="inputbox autowidth" autocomplete="email" />{% endif %}</dd>
 				</dl>
 				<dl>
-					<dd><label for="agreed"><input type="checkbox" name="agreed" id="agreed" value="1"{% if S_AGREED %} checked="checked"{% endif %} /> {{ lang('SLAMB_EXTLOGIN_AGREE', U_TERMS_USE, U_PRIVACY) }}</label></dd>
+					<dd><label for="agreed"><input type="checkbox" name="agreed" id="agreed" value="1"{% if S_AGREED %} checked="checked"{% endif %} /> <span class="slamb-externallogin-consent">{{ lang('SLAMB_EXTLOGIN_AGREE', U_TERMS_USE, U_PRIVACY) }}</span></label></dd>
 				</dl>
 				{% if S_COPPA %}
 				<dl>
-					<dd><label for="adult"><input type="checkbox" name="adult" id="adult" value="1"{% if S_ADULT %} checked="checked"{% endif %} /> {{ lang('SLAMB_EXTLOGIN_ADULT') }}</label></dd>
+					<dd><label for="adult"><input type="checkbox" name="adult" id="adult" value="1"{% if S_ADULT %} checked="checked"{% endif %} /> <span class="slamb-externallogin-consent">{{ lang('SLAMB_EXTLOGIN_ADULT') }}</span></label></dd>
 				</dl>
 				{% endif %}
 			</fieldset>

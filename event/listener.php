@@ -14,6 +14,7 @@ use phpbb\config\config;
 use phpbb\language\language;
 use phpbb\template\template;
 use phpbb\user;
+use slamb\externallogin\service\account_repository;
 use slamb\externallogin\service\provider_manager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -27,7 +28,8 @@ class listener implements EventSubscriberInterface
 		protected language $language,
 		protected template $template,
 		protected user $user,
-		protected provider_manager $providers
+		protected provider_manager $providers,
+		protected account_repository $accounts
 	)
 	{
 	}
@@ -35,9 +37,27 @@ class listener implements EventSubscriberInterface
 	public static function getSubscribedEvents(): array
 	{
 		return [
+			'core.user_setup'						=> 'load_language',
 			'core.login_box_modify_template_data'	=> 'login_box',
 			'core.ucp_register_data_before'			=> 'register_page',
+			'core.delete_user_after'				=> 'delete_user',
 		];
+	}
+
+	public function load_language($event): void
+	{
+		// So that the entries of this extension can be read in the log viewers
+		$lang_set_ext = $event['lang_set_ext'];
+		$lang_set_ext[] = ['ext_name' => 'slamb/externallogin', 'lang_set' => 'logs'];
+		$event['lang_set_ext'] = $lang_set_ext;
+	}
+
+	public function delete_user($event): void
+	{
+		foreach ((array) $event['user_ids'] as $user_id)
+		{
+			$this->accounts->unlink_all((int) $user_id);
+		}
 	}
 
 	public function login_box($event): void

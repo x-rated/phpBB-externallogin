@@ -1,0 +1,32 @@
+{% INCLUDECSS '@slamb_externallogin/externallogin.css' %}
+{% include 'ucp_header.html' %}
+
+<h2>{{ lang('UCP_SLAMB_EXTLOGIN_TITLE') }}</h2>
+
+<div class="panel">
+	<div class="inner">
+		<p>{{ lang('UCP_SLAMB_EXTLOGIN_EXPLAIN') }}</p>
+
+		{% if services %}
+		<div class="slamb-externallogin-services">
+			{% for service in services %}
+			<div class="slamb-externallogin-service">
+				<span class="slamb-externallogin-service-name">{{ service.TITLE }}</span>
+				<span class="slamb-externallogin-service-action">
+					{% if service.S_LINKED %}
+						<a class="button2" href="{{ service.U_UNLINK }}">{{ lang('SLAMB_EXTLOGIN_UNLINK') }}</a>
+						<span class="slamb-externallogin-service-since">{{ lang('SLAMB_EXTLOGIN_LINKED_SINCE', service.LINKED) }}</span>
+					{% else %}
+						<a class="button2" href="{{ service.U_LINK }}" rel="nofollow">{{ lang('SLAMB_EXTLOGIN_LINK') }}</a>
+					{% endif %}
+				</span>
+			</div>
+			{% endfor %}
+		</div>
+		{% else %}
+		<p>{{ lang('UCP_SLAMB_EXTLOGIN_NONE') }}</p>
+		{% endif %}
+	</div>
+</div>
+
+{% include 'ucp_footer.html' %}

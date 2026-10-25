@@ -5,6 +5,7 @@ Admins only paste a client ID and a client secret per provider; everything else 
 
 - phpBB 3.3.19+, PHP 8.5+, GPL-2.0-only
 - Settings: ACP → General → Client communication → External login
+- Members link and unlink services in UCP → Profile → Linked services
 
 ## Setting up Google
 
@@ -52,6 +53,7 @@ The client secret expires (24 months at most). Note the date and create a new on
 3. Open the use case's *Customize* page and make sure the **email** permission is added (`public_profile` is there by default). Standard access is enough, no app review is needed.
 4. Open *Facebook Login → Settings* and paste the *Redirect address* from the extension's ACP page into **Valid OAuth Redirect URIs** (`https://example.com/app.php/externallogin/facebook/callback`). Save.
 5. Open *App settings → Basic*:
+   - put your forum's domain without `https://` and without `www` (e.g. `example.com`) into **App domains**,
    - copy the **App ID** and the **App secret** (click *Show*),
    - fill in the **Privacy policy URL** (`https://example.com/ucp.php?mode=privacy`) and a category,
    - set **User data deletion** to *Data deletion callback URL* and paste the *Data deletion callback URL* from the extension's ACP page (`https://example.com/app.php/externallogin/facebook/deletion`). Save.

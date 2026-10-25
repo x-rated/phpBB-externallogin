@@ -5,6 +5,7 @@ Správce v ACP zadá jen ID klienta a tajný klíč; zbytek se chová jako běž
 
 - phpBB 3.3.19+, PHP 8.5+, GPL-2.0-only
 - Nastavení: ACP → Obecné → Komunikace s klientem → Externí přihlášení
+- Členové si služby propojují a odpojují v UCP → Profil → Propojené služby
 
 ## Zprovoznění Googlu
 
@@ -52,6 +53,7 @@ Tajný klíč vyprší (nejdéle za 24 měsíců). Poznamenej si datum a včas v
 3. Na stránce *Přizpůsobit* tohoto případu použití zkontroluj, že je přidané oprávnění **email** (`public_profile` je výchozí). Stačí standardní přístup, schvalování aplikace není potřeba.
 4. V *Facebook Login → Nastavení* vlož *Přesměrovací adresu* ze stránky rozšíření v ACP do **Valid OAuth Redirect URIs** (`https://example.com/app.php/externallogin/facebook/callback`). Ulož.
 5. V *Nastavení aplikace → Základní*:
+   - do **Domén aplikace** napiš doménu fóra bez `https://` a bez `www` (např. `example.com`),
    - zkopíruj **ID aplikace** a **Tajný klíč aplikace** (tlačítko *Zobrazit*),
    - vyplň **URL zásad ochrany soukromí** (`https://example.com/ucp.php?mode=privacy`) a kategorii,
    - u **Smazání uživatelských dat** zvol *URL zpětného volání pro smazání dat* a vlož adresu pro smazání dat ze stránky rozšíření v ACP (`https://example.com/app.php/externallogin/facebook/deletion`). Ulož.

@@ -19,6 +19,7 @@ use phpbb\template\template;
 use phpbb\user;
 use slamb\externallogin\provider\identity;
 use slamb\externallogin\service\account_repository;
+use slamb\externallogin\service\logger;
 use slamb\externallogin\service\provider_manager;
 use slamb\externallogin\service\state_storage;
 use slamb\externallogin\service\user_creator;
@@ -43,7 +44,8 @@ class register
 		protected account_repository $accounts,
 		protected user_creator $creator,
 		protected string $root_path,
-		protected string $php_ext
+		protected string $php_ext,
+		protected logger $logger
 	)
 	{
 	}
@@ -198,6 +200,7 @@ class register
 			(bool) $pending['email_verified'],
 			$pending['display_name']
 		));
+		$this->logger->registered((int) $result['user_id'], $pending['provider']);
 
 		if ($result['status'] === user_creator::STATUS_ACTIVE)
 		{

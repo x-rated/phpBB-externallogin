@@ -14,6 +14,7 @@ use phpbb\language\language;
 use phpbb\request\request_interface;
 use phpbb\template\template;
 use slamb\externallogin\service\credentials;
+use slamb\externallogin\service\logger;
 use slamb\externallogin\service\provider_manager;
 
 /**
@@ -30,7 +31,8 @@ class controller
 		protected request_interface $request,
 		protected template $template,
 		protected provider_manager $providers,
-		protected credentials $credentials
+		protected credentials $credentials,
+		protected logger $logger
 	)
 	{
 	}
@@ -77,6 +79,11 @@ class controller
 				{
 					$this->credentials->save($id, $enabled, $client_id, $secret);
 				}
+
+				$this->logger->settings_changed(array_values(array_map(
+					fn(string $id): string => $this->providers->all()[$id]->get_title(),
+					array_keys(array_filter($submitted, static fn(array $entry): bool => $entry[0]))
+				)));
 
 				trigger_error($this->language->lang('CONFIG_UPDATED') . adm_back_link($this->u_action));
 			}

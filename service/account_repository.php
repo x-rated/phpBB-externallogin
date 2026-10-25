@@ -44,7 +44,25 @@ class account_repository
 		$user_id = (int) $this->db->sql_fetchfield('user_id');
 		$this->db->sql_freeresult($result);
 
+		// A link left behind by a deleted account must not block the service forever
+		if ($user_id && $this->get_user($user_id) === null)
+		{
+			$this->unlink_all($user_id);
+
+			return 0;
+		}
+
 		return $user_id;
+	}
+
+	/**
+	 * Remove every link of a forum account, for example when the account is deleted.
+	 */
+	public function unlink_all(int $user_id): void
+	{
+		$sql = 'DELETE FROM ' . $this->accounts_table . '
+			WHERE user_id = ' . (int) $user_id;
+		$this->db->sql_query($sql);
 	}
 
 	/**
@@ -124,6 +142,34 @@ class account_repository
 		$sql = 'DELETE FROM ' . $this->accounts_table . "
 			WHERE provider = '" . $this->db->sql_escape($provider) . "'
 				AND provider_uid = '" . $this->db->sql_escape($uid) . "'";
+		$this->db->sql_query($sql);
+
+		return (int) $this->db->sql_affectedrows();
+	}
+
+	/**
+	 * Services linked to a forum account.
+	 *
+	 * @return array[] Rows with provider, provider_uid and linked_time
+	 */
+	public function get_links(int $user_id): array
+	{
+		$sql = 'SELECT provider, provider_uid, linked_time
+			FROM ' . $this->accounts_table . '
+			WHERE user_id = ' . (int) $user_id . '
+			ORDER BY linked_time';
+		$result = $this->db->sql_query($sql);
+		$rows = $this->db->sql_fetchrowset($result);
+		$this->db->sql_freeresult($result);
+
+		return $rows ?: [];
+	}
+
+	public function unlink_user(int $user_id, string $provider): int
+	{
+		$sql = 'DELETE FROM ' . $this->accounts_table . '
+			WHERE user_id = ' . (int) $user_id . "
+				AND provider = '" . $this->db->sql_escape($provider) . "'";
 		$this->db->sql_query($sql);
 
 		return (int) $this->db->sql_affectedrows();

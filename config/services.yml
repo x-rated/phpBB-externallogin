@@ -93,6 +93,7 @@ services:
             - '@slamb.externallogin.user_creator'
             - '%core.root_path%'
             - '%core.php_ext%'
+            - '@slamb.externallogin.logger'
 
     slamb.externallogin.controller.register:
         class: slamb\externallogin\controller\register
@@ -109,6 +110,7 @@ services:
             - '@slamb.externallogin.user_creator'
             - '%core.root_path%'
             - '%core.php_ext%'
+            - '@slamb.externallogin.logger'
 
     slamb.externallogin.admin.controller:
         class: slamb\externallogin\admin\controller
@@ -118,6 +120,7 @@ services:
             - '@template'
             - '@slamb.externallogin.provider_manager'
             - '@slamb.externallogin.credentials'
+            - '@slamb.externallogin.logger'
 
     # ----- Event listener -----
     slamb.externallogin.listener:
@@ -128,6 +131,7 @@ services:
             - '@template'
             - '@user'
             - '@slamb.externallogin.provider_manager'
+            - '@slamb.externallogin.account_repository'
         tags:
             - { name: event.listener }
 
@@ -139,3 +143,20 @@ services:
             - '@request'
             - '@slamb.externallogin.provider_manager'
             - '@slamb.externallogin.account_repository'
+
+    slamb.externallogin.ucp.controller:
+        class: slamb\externallogin\ucp\controller
+        arguments:
+            - '@language'
+            - '@request'
+            - '@template'
+            - '@user'
+            - '@slamb.externallogin.provider_manager'
+            - '@slamb.externallogin.account_repository'
+            - '@slamb.externallogin.logger'
+
+    slamb.externallogin.logger:
+        class: slamb\externallogin\service\logger
+        arguments:
+            - '@log'
+            - '@user'

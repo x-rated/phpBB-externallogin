@@ -100,6 +100,18 @@ class provider_manager
 		return $this->helper->route('slamb_externallogin_facebook_deletion', [], false, '', UrlGeneratorInterface::ABSOLUTE_URL);
 	}
 
+	/**
+	 * Link for a signed-in member who adds a service to the account. The hash proves the click came from the board.
+	 */
+	public function get_link_url(string $id): string
+	{
+		return $this->helper->route('slamb_externallogin_start', [
+			'provider'	=> $id,
+			'link'		=> 1,
+			'hash'		=> generate_link_hash('slamb_externallogin_link'),
+		]);
+	}
+
 	public function get_client_id(string $id): string
 	{
 		return $this->credentials->get_client_id($id);

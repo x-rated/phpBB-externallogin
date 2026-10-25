@@ -39,7 +39,7 @@ class state_storage
 	/**
 	 * Remember a started sign-in and return its state value.
 	 */
-	public function create_state(string $provider, string $session_id, string $nonce, string $verifier, string $redirect): string
+	public function create_state(string $provider, string $session_id, string $nonce, string $verifier, string $redirect, string $purpose = 'login'): string
 	{
 		$this->purge();
 
@@ -52,6 +52,7 @@ class state_storage
 			'nonce'			=> $nonce,
 			'verifier'		=> $verifier,
 			'redirect'		=> $redirect,
+			'purpose'		=> $purpose,
 			'state_time'	=> time(),
 		]);
 		$this->db->sql_query($sql);
