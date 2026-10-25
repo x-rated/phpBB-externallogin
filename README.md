@@ -48,20 +48,73 @@ The client secret expires (24 months at most). Note the date and create a new on
 
 ## Setting up Facebook (Meta)
 
+Facebook is by far the fiddliest of the three. Meta requires an app review for the e-mail permission, checks your privacy policy page with its own crawler and only lets people with a role in the app sign in until the app is **Live**. Plan an evening for it, do the steps in this order, and read the troubleshooting list at the end before you start. Meta's dashboard changes often, so menu names may differ slightly (the dashboard follows your Facebook language).
+
+### 1. Create the app
+
 1. Open [Meta for Developers](https://developers.facebook.com/apps/), sign in and register as a developer if asked.
-2. *Create app*: app name, contact e-mail, use case *Authenticate and request data from users with Facebook Login*. Choose the app type *Consumer* if asked.
-3. Open the use case's *Customize* page and make sure the **email** permission is added (`public_profile` is there by default). Standard access is enough, no app review is needed.
-4. Open *Facebook Login → Settings* and paste the *Redirect address* from the extension's ACP page into **Valid OAuth Redirect URIs** (`https://example.com/app.php/externallogin/facebook/callback`). Save.
-5. Open *App settings → Basic*:
-   - put your forum's domain without `https://` and without `www` (e.g. `example.com`) into **App domains**,
-   - copy the **App ID** and the **App secret** (click *Show*),
-   - fill in the **Privacy policy URL** (`https://example.com/ucp.php?mode=privacy`) and a category,
-   - set **User data deletion** to *Data deletion callback URL* and paste the *Data deletion callback URL* from the extension's ACP page (`https://example.com/app.php/externallogin/facebook/deletion`). Save.
-6. Paste the App ID (as the client ID) and the App secret into the extension's ACP page, set *Enable* to *Yes* and submit.
-7. Switch the app from *Development* to **Live** (toggle at the top of the dashboard). In development mode only people with a role in the app can sign in.
+2. *Create app*: app name, contact e-mail, use case **Authenticate and request data from users with Facebook Login**. Choose the app type *Consumer* if asked. If Meta asks for a business portfolio, pick your own verified one (you need it later for the review).
+
+### 2. Permissions (use case)
+
+3. **Add the e-mail permission before you submit anything for review**, otherwise it is missing from the submission and you have to send it again. Open *Use cases → Customize* of that use case and make sure both **public_profile** and **email** are added. Click *Add* next to **email** if it is not there yet. Without it Facebook returns no e-mail address to normal users.
+4. The permissions are not usable by the public until Meta approves them (see *Review* below). People with a role in the app (admin, developer, tester) can use them immediately, which is why your own tests work even when the review is not done.
+
+### 3. Redirect address
+
+5. Open the same use case's **Settings** (*Use cases → Customize → Settings*, the *Facebook Login* settings) and paste the *Redirect address* from the extension's ACP page into **Valid OAuth Redirect URIs**. Copy it exactly as the ACP shows it, for example `https://www.example.com/externallogin/facebook/callback` (the form with `app.php` appears if your forum does not use clean URLs). `www` and `https` count. Save.
+6. If you want to check it, the *Redirect URI Validator* in the same settings tells you whether an address is accepted. An **empty** field produces the misleading error "domain is not included in the app's domains".
+
+### 4. Basic settings
+
+7. Open *App settings → Basic* and fill in all of these, then click **Save Changes** (it is easy to leave without saving):
+   - **App domains**: your domain without `https://` and without `www` (`example.com`).
+   - **Display name**, **Contact email**, **Category** and the **App icon**.
+   - **Privacy policy URL**: `https://www.example.com/ucp.php?mode=privacy`.
+   - **Terms of Service URL**: `https://www.example.com/ucp.php?mode=terms`.
+   - **User data deletion**: choose *Data deletion callback URL* and paste the *Data deletion callback URL* from the extension's ACP page (`https://www.example.com/externallogin/facebook/deletion`).
+   - Under *Add platform → Website*, set **Site URL** to `https://www.example.com/`.
+   - The branding fields and the business portfolio may be marked as required; fill them in too.
+8. Copy the **App ID** and the **App secret** (click *Show*). Paste them into the extension's ACP page as client ID and secret, set *Enable* to *Yes* and submit.
+
+### 5. Let Meta read your pages
+
+Meta fetches the privacy policy URL with its own crawler (`facebookexternalhit`, network AS 32934) from abroad. It must get a normal **HTTP 200**. If a firewall, Cloudflare rule, geo-blocking or bot protection answers with a challenge, a block or an error page, Meta reports "You must provide a valid Privacy Policy URL" although the field is filled in correctly.
+
+- Test it at the [Sharing Debugger](https://developers.facebook.com/tools/debug/): paste the privacy policy URL and click *Debug* / *Scrape Again*. You want response code 200. "Bad Response Code" means Meta is being stopped.
+- The privacy and terms pages must be readable by guests (not only by logged-in members).
+- Cloudflare example: if you have a rule that challenges visitors from outside your country on `.php` pages, add an exception for Meta, for instance `... and ip.src.asnum ne 32934`, or put a *Skip* rule for `ip.src.asnum eq 32934` before it. The log of the web server shows what Meta received; look for `facebookexternalhit`.
+
+### 6. Review
+
+9. Open *Review* in the left menu. Typically you go through three parts:
+   - **Testing**: Meta wants to see that the permissions were really used. Make a test sign-in with your own account and, if the page asks for it, call the permission once (for example in the Graph API Explorer with `me?fields=id,name,email`).
+   - **Verification**: verify the business (the business portfolio you picked in section 1). Meta may require this before it approves the e-mail permission or lets you publish.
+   - **App Review**: submit **public_profile** and **email**. Give the reviewer short instructions: where the sign-in button is (login page and registration page), a test account if the reviewer needs one, and that the e-mail address is used to create the forum account. Describe honestly what you do with the data.
+10. Submit. Meta says reviews take up to 20 days; in practice it may take hours or days. Check the status under *Review → App Review* until both permissions show **Approved**. Until then normal visitors sign in without an e-mail address and the registration form asks for it.
+
+### 7. Publish (go Live)
+
+11. Open *Publish* (*Zveřejnit*) in the left menu. The *Publish* button at the bottom right stays grey until everything on the page is complete: the data deletion URL must be set, the privacy policy URL must be valid (see section 5) and the use case must be reviewed. Click each row and finish what it asks for.
+12. Click **Publish**. The app status changes from *Unpublished* / *Development* to **Live**. In development mode only people with a role in the app can sign in; everybody else gets "App not active".
+
+### 8. Test as a normal visitor
+
+Your own account has a role in the app and always works. Test the final result with a Facebook account **without any role** (best in a private window), once for sign-in and once for a new registration.
+
+### Troubleshooting
+
+| What you see | Cause and fix |
+| --- | --- |
+| "App not active" / "Aplikace není aktivní" | The app is still in development mode and the account has no role in it. Publish the app (section 7) or add the person as a tester. |
+| "The domain of this URL isn't included in the app's domains" although it is | The **Valid OAuth Redirect URIs** field is empty or the address is wrong (section 3). Check `www`, `https` and `app.php`. |
+| "This is an invalid redirect URI" | The address in Valid OAuth Redirect URIs differs from the one the extension sends. Copy it again from the ACP page. |
+| "You must provide a valid Privacy Policy URL" | Meta cannot fetch the page (section 5), or the Basic settings were not saved. Use the Sharing Debugger. |
+| The sign-in window shows "Submit for review" / "Odeslat kvůli kontrole přihlášení" | One of the requested permissions is not approved yet. Only app admins see the banner; check *Review → App Review* and submit the missing permission. |
+| Facebook returns no e-mail | The permission is not approved, or the person has no e-mail on the account. The registration form then asks for the address; this is intended. |
+| "An account with this e-mail address already exists" (409) | Intended. A Facebook e-mail is never trusted for linking. The member signs in as usual and links Facebook in *UCP → Profile → Linked services*. |
+| *Publish* stays grey | Open every row on the Publish page and finish it: data deletion URL, privacy policy URL, use case review. |
 
 A Facebook e-mail address is never treated as verified and Facebook may send none at all; the sign-up form then asks for it. A deletion request from Meta removes the link between the Facebook user and the forum account; the forum account itself stays.
-
-Meta's dashboard changes often, so menu names may differ slightly.
 
 Brand icons: [Font Awesome Free](https://fontawesome.com/) 7 (CC BY 4.0).
