@@ -48,7 +48,7 @@ Tajný klíč vyprší (nejdéle za 24 měsíců). Poznamenej si datum a včas v
 
 ## Zprovoznění Facebooku (Meta)
 
-Facebook je z těch tří nejpracnější. Meta vyžaduje schválení (review) oprávnění pro e-mail, zásady ochrany soukromí kontroluje vlastním robotem a dokud není aplikace **Live**, pustí dovnitř jen lidi s rolí v aplikaci. Počítej s celým večerem, dělej kroky v tomto pořadí a než začneš, přečti si na konci seznam častých potíží. Panel Meta se často mění a řídí se jazykem tvého Facebooku, takže se názvy menu mohou lehce lišit.
+Facebook je z těch tří nejpracnější. **Meta si uložené hodnoty ne vždy zapamatuje**: po každém uložení stránku obnov a zkontroluj, že hodnoty zůstaly (Valid OAuth Redirect URIs, Domény aplikace, URL pro smazání dat, URL zásad), a před zveřejněním je zkontroluj ještě jednou. Meta vyžaduje schválení (review) oprávnění pro e-mail, zásady ochrany soukromí kontroluje vlastním robotem a dokud není aplikace **Live**, pustí dovnitř jen lidi s rolí v aplikaci. Počítej s celým večerem, dělej kroky v tomto pořadí a než začneš, přečti si na konci seznam častých potíží. Panel Meta se často mění a řídí se jazykem tvého Facebooku, takže se názvy menu mohou lehce lišit.
 
 ### 1. Vytvoření aplikace
 

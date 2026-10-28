@@ -48,7 +48,7 @@ The client secret expires (24 months at most). Note the date and create a new on
 
 ## Setting up Facebook (Meta)
 
-Facebook is by far the fiddliest of the three. Meta requires an app review for the e-mail permission, checks your privacy policy page with its own crawler and only lets people with a role in the app sign in until the app is **Live**. Plan an evening for it, do the steps in this order, and read the troubleshooting list at the end before you start. Meta's dashboard changes often, so menu names may differ slightly (the dashboard follows your Facebook language).
+Facebook is by far the fiddliest of the three. **Meta does not always keep what you save**: after every save, reload the page and check that the values are still there (Valid OAuth Redirect URIs, App domains, Data deletion callback URL, privacy policy URL), and check them again before you publish. Meta requires an app review for the e-mail permission, checks your privacy policy page with its own crawler and only lets people with a role in the app sign in until the app is **Live**. Plan an evening for it, do the steps in this order, and read the troubleshooting list at the end before you start. Meta's dashboard changes often, so menu names may differ slightly (the dashboard follows your Facebook language).
 
 ### 1. Create the app
 
