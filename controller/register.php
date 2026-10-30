@@ -14,6 +14,7 @@ use phpbb\config\config;
 use phpbb\controller\helper;
 use phpbb\exception\http_exception;
 use phpbb\language\language;
+use phpbb\profilefields\manager as profilefields_manager;
 use phpbb\request\request_interface;
 use phpbb\template\template;
 use phpbb\user;
@@ -45,7 +46,8 @@ class register
 		protected user_creator $creator,
 		protected string $root_path,
 		protected string $php_ext,
-		protected logger $logger
+		protected logger $logger,
+		protected profilefields_manager $profile_fields
 	)
 	{
 	}
@@ -76,11 +78,6 @@ class register
 			throw new http_exception(Response::HTTP_FORBIDDEN, 'UCP_REGISTER_DISABLE');
 		}
 
-		if ($this->creator->has_required_profile_fields())
-		{
-			throw new http_exception(Response::HTTP_FORBIDDEN, 'SLAMB_EXTLOGIN_ERR_PROFILE_FIELDS');
-		}
-
 		// An address the provider vouches for is not editable
 		$email_locked = (bool) $pending['email_verified'] && $pending['account_email'] !== '';
 
@@ -89,6 +86,7 @@ class register
 		$email = utf8_htmlspecialchars($pending['account_email']);
 		$agreed = false;
 		$adult = false;
+		$cp_data = [];
 
 		if ($this->request->is_set_post('submit'))
 		{
@@ -100,6 +98,11 @@ class register
 
 			$errors = $this->validate($username, $email, $agreed, $adult);
 
+			// Custom profile fields set to show on registration, validated as the regular form does
+			$cp_error = [];
+			$this->profile_fields->submit_cp_field('register', $this->user->get_iso_lang_id(), $cp_data, $cp_error);
+			$errors = array_merge($errors, array_map([$this->language, 'lang'], $cp_error));
+
 			if (!$errors)
 			{
 				// Used up before the account exists, so a double click cannot create two
@@ -108,7 +111,7 @@ class register
 					throw new http_exception(Response::HTTP_GONE, 'SLAMB_EXTLOGIN_ERR_EXPIRED');
 				}
 
-				return $this->finish($pending, $username, $email, $email_locked);
+				return $this->finish($pending, $username, $email, $email_locked, $cp_data);
 			}
 		}
 
@@ -128,6 +131,9 @@ class register
 			'U_TERMS_USE'		=> append_sid($this->root_path . 'ucp.' . $this->php_ext, 'mode=terms'),
 			'U_PRIVACY'			=> append_sid($this->root_path . 'ucp.' . $this->php_ext, 'mode=privacy'),
 		]);
+
+		// Fills the profile_fields block and PROFILE_FIELDS_REQUIRED; entered values come back after an error
+		$this->profile_fields->generate_profile_fields('register', $this->user->get_iso_lang_id());
 
 		return $this->helper->render('@slamb_externallogin/register.html', $this->language->lang('REGISTRATION'));
 	}
@@ -181,11 +187,11 @@ class register
 	/**
 	 * Create the account and tell the visitor how it goes on.
 	 */
-	protected function finish(array $pending, string $username, string $email, bool $email_locked): Response
+	protected function finish(array $pending, string $username, string $email, bool $email_locked, array $cp_data): Response
 	{
 		try
 		{
-			$result = $this->creator->create($username, $email, $email_locked);
+			$result = $this->creator->create($username, $email, $email_locked, $cp_data);
 		}
 		catch (\RuntimeException $exception)
 		{

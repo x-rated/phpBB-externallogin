@@ -3,7 +3,7 @@
 	"type": "phpbb-extension",
 	"description": "Log in and register with a Google, Microsoft or Facebook account.",
 	"homepage": "https://www.slamb.eu",
-	"version": "0.5.6",
+	"version": "0.6.3",
 	"time": "2026-10-24",
 	"license": "GPL-2.0-only",
 	"authors": [

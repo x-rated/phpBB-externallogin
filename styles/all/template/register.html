@@ -1,3 +1,4 @@
+{% INCLUDECSS '@slamb_externallogin/externallogin.css' %}
 {% include 'overall_header.html' %}
 
 <form method="post" action="{{ S_ACTION }}" id="slamb_externallogin_register">
@@ -13,8 +14,15 @@
 				</dl>
 				<dl>
 					<dt><label for="email">{{ lang('EMAIL_ADDRESS') }}{{ lang('COLON') }}</label></dt>
-					<dd>{% if S_EMAIL_LOCKED %}<strong>{{ EMAIL }}</strong>{% else %}<input type="email" tabindex="2" name="email" id="email" size="25" maxlength="100" value="{{ EMAIL }}" class="inputbox autowidth" autocomplete="email" />{% endif %}</dd>
+					<dd><input type="email" tabindex="2" name="email" id="email" size="25" maxlength="100" value="{{ EMAIL }}" class="inputbox autowidth{% if S_EMAIL_LOCKED %} slamb-externallogin-locked{% endif %}" autocomplete="email"{% if S_EMAIL_LOCKED %} readonly="readonly"{% endif %} /></dd>
 				</dl>
+				{% if PROFILE_FIELDS_REQUIRED %}<dl><dd><strong>{{ lang('ITEMS_REQUIRED') }}</strong></dd></dl>{% endif %}
+				{% for profile_field in profile_fields %}
+				<dl>
+					<dt><label{% if profile_field.FIELD_ID %} for="{{ profile_field.FIELD_ID }}"{% endif %}>{{ profile_field.LANG_NAME }}{{ lang('COLON') }}{% if profile_field.S_REQUIRED %} *{% endif %}</label>{% if profile_field.LANG_EXPLAIN %}<br /><span>{{ profile_field.LANG_EXPLAIN }}</span>{% endif %}</dt>
+					<dd>{{ profile_field.FIELD }}</dd>
+				</dl>
+				{% endfor %}
 				<dl>
 					<dd><label for="agreed"><input type="checkbox" name="agreed" id="agreed" value="1"{% if S_AGREED %} checked="checked"{% endif %} /> <span class="slamb-externallogin-consent">{{ lang('SLAMB_EXTLOGIN_AGREE', U_TERMS_USE, U_PRIVACY) }}</span></label></dd>
 				</dl>

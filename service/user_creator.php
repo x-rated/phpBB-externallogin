@@ -34,7 +34,6 @@ class user_creator
 		protected notification_manager $notification_manager,
 		protected user $user,
 		protected string $groups_table,
-		protected string $profile_fields_table,
 		protected string $root_path,
 		protected string $php_ext
 	)
@@ -58,31 +57,15 @@ class user_creator
 	}
 
 	/**
-	 * The regular form asks for required profile fields, this registration has no room for them.
-	 */
-	public function has_required_profile_fields(): bool
-	{
-		$sql = 'SELECT field_id
-			FROM ' . $this->profile_fields_table . '
-			WHERE field_active = 1
-				AND field_show_on_reg = 1
-				AND field_required = 1';
-		$result = $this->db->sql_query_limit($sql, 1);
-		$found = (bool) $this->db->sql_fetchrow($result);
-		$this->db->sql_freeresult($result);
-
-		return $found;
-	}
-
-	/**
 	 * Create the account. Active accounts are signed in right away.
 	 *
 	 * @param string $username Already validated
 	 * @param string $email Already validated
 	 * @param bool $email_verified Whether the identity provider vouches for the address
+	 * @param array $cp_data Validated custom profile field data of the registration form
 	 * @return array{user_id: int, status: string}
 	 */
-	public function create(string $username, string $email, bool $email_verified): array
+	public function create(string $username, string $email, bool $email_verified, array $cp_data = []): array
 	{
 		include_once $this->root_path . 'includes/functions_user.' . $this->php_ext;
 
@@ -139,7 +122,7 @@ class user_creator
 			$user_row['user_new'] = 1;
 		}
 
-		$user_id = user_add($user_row);
+		$user_id = user_add($user_row, $cp_data ?: false);
 
 		if ($user_id === false)
 		{

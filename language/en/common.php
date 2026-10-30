@@ -31,7 +31,6 @@ $lang = array_merge($lang, [
 	'SLAMB_EXTLOGIN_ERR_DISABLED'		=> 'This sign-in method is not available.',
 	'SLAMB_EXTLOGIN_ERR_EMAIL_EXISTS'	=> 'An account with this e-mail address already exists. Log in the usual way and add the service in the User Control Panel under Profile > Linked services.',
 	'SLAMB_EXTLOGIN_ERR_EXPIRED'		=> 'This sign-up has expired. Please start again.',
-	'SLAMB_EXTLOGIN_ERR_PROFILE_FIELDS'	=> 'This board requires extra profile fields, so sign-up with an external service is not possible.',
 	'SLAMB_EXTLOGIN_ERR_PROVIDER'		=> 'The sign-in failed. Please try again later.',
 	'SLAMB_EXTLOGIN_DELETED'				=> 'The link between your forum account and Facebook has been removed. Your forum account itself stays; ask the board administrator if you want it deleted too.',
 	'SLAMB_EXTLOGIN_ERR_STATE'			=> 'The sign-in request is invalid or has expired. Please try again.',

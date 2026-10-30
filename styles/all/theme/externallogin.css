@@ -62,3 +62,9 @@
 .slamb-externallogin-service-action .button2 {
 	margin: 0;
 }
+
+/* An address vouched for by the provider cannot be changed; it still looks like the other fields */
+.slamb-externallogin-locked {
+	cursor: default;
+	opacity: 0.75;
+}

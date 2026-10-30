@@ -243,11 +243,6 @@ class auth
 			throw new http_exception(Response::HTTP_FORBIDDEN, 'UCP_REGISTER_DISABLE');
 		}
 
-		if ($this->creator->has_required_profile_fields())
-		{
-			throw new http_exception(Response::HTTP_FORBIDDEN, 'SLAMB_EXTLOGIN_ERR_PROFILE_FIELDS');
-		}
-
 		$token = $this->states->create_pending($identity, (string) $this->user->session_id, $redirect);
 
 		return new RedirectResponse($this->helper->route('slamb_externallogin_register', ['token' => $token], false, '', UrlGeneratorInterface::ABSOLUTE_URL));

@@ -75,7 +75,6 @@ services:
             - '@notification_manager'
             - '@user'
             - '%tables.groups%'
-            - '%tables.profile_fields%'
             - '%core.root_path%'
             - '%core.php_ext%'
 
@@ -111,6 +110,7 @@ services:
             - '%core.root_path%'
             - '%core.php_ext%'
             - '@slamb.externallogin.logger'
+            - '@profilefields.manager'
 
     slamb.externallogin.admin.controller:
         class: slamb\externallogin\admin\controller

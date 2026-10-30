@@ -31,7 +31,6 @@ $lang = array_merge($lang, [
 	'SLAMB_EXTLOGIN_ERR_DISABLED'		=> 'Tento způsob přihlášení není dostupný.',
 	'SLAMB_EXTLOGIN_ERR_EMAIL_EXISTS'	=> 'Účet s touto e-mailovou adresou již existuje. Přihlaste se běžným způsobem a službu si přidejte v uživatelském panelu v části Profil > Propojené služby.',
 	'SLAMB_EXTLOGIN_ERR_EXPIRED'		=> 'Platnost registrace vypršela. Začněte prosím znovu.',
-	'SLAMB_EXTLOGIN_ERR_PROFILE_FIELDS'	=> 'Toto fórum vyžaduje další pole profilu, registrace přes externí službu proto není možná.',
 	'SLAMB_EXTLOGIN_ERR_PROVIDER'		=> 'Přihlášení se nezdařilo. Zkuste to prosím později.',
 	'SLAMB_EXTLOGIN_DELETED'				=> 'Propojení vašeho účtu na fóru s Facebookem bylo odstraněno. Samotný účet na fóru zůstává; pokud chcete smazat i ten, obraťte se na správce fóra.',
 	'SLAMB_EXTLOGIN_ERR_STATE'			=> 'Požadavek na přihlášení je neplatný nebo vypršel. Zkuste to prosím znovu.',
